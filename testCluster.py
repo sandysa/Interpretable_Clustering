@@ -85,10 +85,20 @@ def find_best_config(G,k,Features,feature_indices=[]):
         # Call K center for each config.
         for v_index in range(len(V)):
             v = V[v_index]
+            # if(v_index%100 == 0):
+            #     print(v)
+
+            # Num of nodes satisfying the feature < config of V.Skip.
+            if(G_prime.number_of_nodes() < int(v[i])):
+                temp_objective[:,i] = 100000
+                continue
+
             kc = K_center(G_prime, int(v[i]),domain_distance)
             kc.fit()
             temp_objective[v_index][i] = kc.ObjValue()
             del kc
+            
+
     best_obj = 10000000
     best_config = []
     for j in range(len(V)):
@@ -374,8 +384,8 @@ def main():
     G  = Ld.readFile()
     k = 40
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance)
-    # test_IKC1(G,k) #currently works for t <= k
-    test_Kcenter(G, k,domain)
+    test_IKC1(G,k) #currently works for t <= k
+    # test_Kcenter(G, k,domain)
     # raw_Interpretability(G,k,domain)
     del Ld
 
