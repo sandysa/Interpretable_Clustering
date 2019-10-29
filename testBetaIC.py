@@ -38,15 +38,17 @@ def test_Kcenter(G, k,domain):
 def main():
     Ld = LoadData(domain)
     G  = Ld.readFile()
-    k = 5
+    k = 50
     beta = 1.0
+    distance_file = domain+"_distance.txt"
+    # distance_file = ""
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance, "beta=", beta)
     aff_array = test_Kcenter(G,k,domain)
     print("\n")
     print("#######################################################################\n")
-    bs = betaStrong(domain,G, aff_array,k, beta, domain_distance)
+    bs = betaStrong(domain,G, aff_array,k, beta, domain_distance,distance_file)
     aff_array = bs.beta_IC()
-    calculate_composition(G,k,aff_array,domain)
+    # calculate_composition(G,k,aff_array,domain)
     del Ld
 
 

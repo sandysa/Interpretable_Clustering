@@ -5,7 +5,7 @@ import time
 from SupportFunctions import *
 
 class betaStrong():
-    def __init__(self, domain,G, aff_array,k, beta, distance):
+    def __init__(self, domain,G, aff_array,k, beta, distance,distance_File=""):
         self.domain = domain
         self.G = G
         self.aff_array = aff_array
@@ -13,11 +13,37 @@ class betaStrong():
         self.beta = beta
         self.distanceFunction = distance
         self.pairwiseDistance = np.zeros((len(self.G.nodes()), len(self.G.nodes())))
+        self.distanceFile = self.domain+"_distance.txt"
+        self.inputDistance = distance_File
 
     def precompute_pairwiseDistances(self):
-        for i in self.G.nodes():
-            for j in self.G.nodes():
-                self.pairwiseDistance[i][j] = self.getdistance(i,j)
+        if self.inputDistance == "":
+            for i in self.G.nodes():
+                if (i+1)%100 == 0:
+                    print("calculated distance for", (i+1), " nodes")
+                for j in self.G.nodes():
+                    self.pairwiseDistance[i][j] = self.getdistance(i,j)
+
+            myfile  = open(self.distanceFile,"w+")
+            for i in self.G.nodes():
+                for j in self.G.nodes():
+                    myfile.write(str(self.pairwiseDistance[i][j]) + "\n")
+            myfile.close()
+        else:
+            print("reading from input distance file")
+            f = open(self.inputDistance, 'r')
+            dist_data = f.readlines()
+            f.close()
+            index = 0
+            for i in self.G.nodes():
+                for j in self.G.nodes():
+                    temp = dist_data[index].split("\n")
+                    self.pairwiseDistance[i][j] = float(temp[0])
+                    index += 1
+
+            print("loaded distance")
+
+
 
     def ClusterNodes(self, cluster_id, aff_array):
         nodeList = []
@@ -61,8 +87,6 @@ class betaStrong():
     def indexed_partition(self, nodesList,limit1,limit2):
         R1 = []
         R2 = []
-        if limit1+ limit2 != len(nodesList):
-            print('error in indexed partition.')
         R1 = nodesList[:limit1]
         R2 = nodesList[limit1:]
         return R1, R2
@@ -74,13 +98,20 @@ class betaStrong():
         for f_index in range(1,5):
             node_set[f_index-1] = features_nodes(nodeList, f_index,self.domain,self.G)
             L.append(len(node_set[f_index-1]))
-        sorted_L = L.copy()
+        sorted_L = L[:]
         sorted_L.sort(reverse=True)
         l0 = sorted_L[0]
         l1 = sorted_L[1]
         # indices of top 2 feature values in terms of size.
         c1_findex = L.index(l0)
-        c2_findex = L.index(l1)
+        # l0 and l1 may have the same value and as a result
+        # c1_finxed and c2_findex may have the same value if list.index is used.
+        # We avoid that by looping over L.
+        c2_findex = -1
+        for l in range(len(L)):
+            if L[l] == l1 and l!= c1_findex:
+                c2_findex = l
+
         c1_c2_union = self.union(node_set[c1_findex],node_set[c2_findex])
         R = list(set(nodeList).difference(set(c1_c2_union)))
         limit1 = int(round((l0 * len(R))/(l0+l1)))
@@ -174,7 +205,7 @@ class betaStrong():
         # Find closest cluster to move each node in discard pile
         moved = 0
         for m in discard_nodes:
-            distances = [self.pairwiseDistance[m][centroid[c]] for c in range(self.k)]
+            distances = [self.pairwiseDistance[m][int(centroid[c])] for c in range(self.k)]
             distances[target_cluster] =  float('inf')# because we want to remove the node.
             min_dist = float('inf')
             best_fit = -1
