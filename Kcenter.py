@@ -80,9 +80,11 @@ class K_center:
                 distances = [self.distance(t, self.centroids[centroid]) for centroid in self.centroids]
                 min_distances[index] = min(distances)
                 index +=1
+            # print("Min = ",min_distances)
             next_center = min_distances.index(max(min_distances))
             self.centroids[c] = nodes_list[next_center]
             temp_G.remove_node(nodes_list[next_center])
+            # print("size of the graph = ", len(temp_G.nodes()))
 
     def fit(self):
         self.find_centers()
