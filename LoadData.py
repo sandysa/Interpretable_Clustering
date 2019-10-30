@@ -18,7 +18,7 @@ class LoadData:
 
 
     def loadPokecData(self):
-        filename = "../Dataset/Pokec/processed-pokec-profiles10K.txt"
+        filename = "Dataset/Pokec/processed-pokec-profiles10K.txt"
         G = nx.Graph()
         attributes = {}
         index = -1
@@ -55,7 +55,7 @@ class LoadData:
         return G,attributes
 
     def loaddblpData(self):
-        filename = "../Dataset/dblp/CORE.csv"
+        filename = "Dataset/dblp/CORE.csv"
         G = nx.Graph()
         attributes = {}
         index = -1
@@ -88,7 +88,7 @@ class LoadData:
         return G
 
     def loadAdultIncomeData(self):
-        filename = "../Dataset/adultIncome/adult_data.txt"
+        filename = "Dataset/adultIncome/adult_data.txt"
         workclass =['Private','Self-emp-not-inc','Self-emp-inc','Federal-gov','Local-gov','State-gov','Without-pay','Never-worked']
         education = ['Bachelors','Some-college','11th','HS-grad','Prof-school','Assoc-acdm','Assoc-voc','9th','7th-8th','12th',
                      'Masters', '1st-4th', '10th', 'Doctorate', '5th-6th','Preschool']
@@ -146,7 +146,7 @@ class LoadData:
         return G
 
     def loadAccidentData(self):
-        filename = "../Dataset/Kenya/2011_Traffic_Incidences_From_Desinventar.csv"
+        filename = "Dataset/Kenya/2011_Traffic_Incidences_From_Desinventar.csv"
         G = nx.Graph()
         attributes = {}
         index = -1
@@ -178,7 +178,7 @@ class LoadData:
 
 
     def loadSanitationData(self):
-        filename = "../Dataset/Kenya/Sanitation_by_District.csv"
+        filename = "Dataset/Kenya/Sanitation_by_District.csv"
         G = nx.Graph()
         attributes = {}
         index = -1
@@ -213,7 +213,7 @@ class LoadData:
         return G
 
     def loadHouseholdData(self):
-        filename = "../Dataset/Kenya/Households_by_Number_of_Dwelling_Units_and_County_2009.csv"
+        filename = "Dataset/Kenya/Households_by_Number_of_Dwelling_Units_and_County_2009.csv"
         G = nx.Graph()
         attributes = {}
         index = -1
@@ -240,7 +240,7 @@ class LoadData:
         return G
 
     def loadCrimeData(self):
-        filename = "../Dataset/Crime/communities_data.txt"
+        filename = "Dataset/Crime/communities_data.txt"
         G = nx.Graph()
         attributes = {}
         index = -1
