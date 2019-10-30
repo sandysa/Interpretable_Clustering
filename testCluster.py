@@ -13,11 +13,10 @@ from LoadData import *
 from PatternMining import *
 from SupportFunctions import *
 
-# domain  = {"crime","adult", "household","sanitation","accident","pokec","dblp"}
 # domains we use = {'accident','sanitation','crime','adult'}
 # Corresponding distances:{Jaccard,euclidean,euclidean,euclidean}
-domain = "crime"
-domain_distance = "euclidean"
+domain = "accident"
+domain_distance = "Jaccard"
 
 
 def test_Kcenter(G, k,domain):
@@ -399,18 +398,70 @@ def test_IKC1(G,k,distance_file):
         print("dist file in ikc",distance_file)
         test_adult_IC1(G,k,distance_file)
 
+# This baseline partitions the data into |F| clusters by optimizing for
+# interpretability (homogeneity) alone.
+def find_interpretable_partition(G,k,Features,feature_indices=[],distance_file=""):
+    final_obj = 0
+    total_count = 0
+    cluster_count = int(k/len(Features))
+    for i in range(len(Features)):
+        if domain == "accident":
+            G_prime =  getAccidentSubGraph(G,Features,i)
+        elif domain == "adult":
+            G_prime  = getAdultSubGraph(G,Features,i)
+        else:
+            temp = Features[i].split("-")
+            lb = temp[0].strip()
+            ub = temp[1].strip()
+            G_prime = getSubGraph_rangeValue(G,lb,ub,feature_indices[i])
 
+        if(i+1 == len(Features)):
+            cluster_count = k - total_count
+
+        print(Features[i],cluster_count)
+        kc = K_center(G_prime,cluster_count,domain_distance,distance_file)
+        kc.fit()
+        obj = kc.ObjValue()
+        del kc
+        total_count += cluster_count
+        if obj > final_obj:
+            final_obj = obj
+    print("total clusters = ", total_count)
+    return final_obj
+
+def baseline_partition(G,k,distance_file):
+    kc_obj = 0
+    start_time = time.time()
+    if domain == "accident":
+        Features =['Pedestrian hit','Vehicle collision','Death','Others'] #accident types
+        feature_indices = [10,10,10,10]
+    elif domain == "adult":
+        Features = ['age <= 40 and pay <= 50K', 'age <= 40 and pay >50K','age >40 and pay <=50K', 'age >40 and pay >50K']
+        feature_indices = [16,16,16,16] #placeholder.
+    elif domain == "crime":
+        Features = ['0-.25','.25-.50','.50-.75','.75-1.00']
+        feature_indices = [16,16,16,16]
+    elif domain == "sanitation":
+        Features = ['0-25','25-50','50-75','75-100'] #pit latrines
+        feature_indices = [4,4,4,4]
+    kc_obj = find_interpretable_partition(G,k,Features,feature_indices,distance_file)
+    print("Objective value = ", kc_obj)
+    print("Time taken (s) = ", time.time() - start_time)
 
 
 def main():
     Ld = LoadData(domain)
     G  = Ld.readFile()
-    k = 50
-    distance_file = domain+"_distance.txt"
+    k = 10
+    distance_file = ""
+    if (os.path.isfile(domain+"_distance.txt")):
+        distance_file = domain+"_distance.txt"
+
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance)
-    test_IKC1(G,k,distance_file) #currently works for t <= k
+    # test_IKC1(G,k,distance_file) #currently works for t <= k
     # test_Kcenter(G, k,domain)
     # raw_Interpretability(G,k,domain)
+    baseline_partition(G,k,distance_file)
     del Ld
 
 
