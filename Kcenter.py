@@ -9,7 +9,7 @@ import networkx as nx
 def arreq_in_list(myarr, list_arrays):
     return next((True for elem in list_arrays if np.array_equal(elem, myarr)), False)
 class K_center:
-    def __init__(self, G, k=3, distance="", tolerance=0.0001, max_iterations=500):
+    def __init__(self, G, k=3, distance="",distanceFile="", tolerance=0.0001, max_iterations=500):
         self.G = G
         self.k = k
         self.tolerance = tolerance
@@ -18,9 +18,29 @@ class K_center:
         self.centroids = {}
         self.classes = {}
         self.affiliationArray = [-1 for n in self.G]
+        self.pairwiseDistance = np.zeros((len(self.G.nodes()), len(self.G.nodes())))
         self.distanceFunction = distance
+        self.inputDistance = distanceFile
+
+    def precompute_pairwiseDistances(self):
+        # print("reading from input distance file")
+        f = open(self.inputDistance, 'r')
+        dist_data = f.readlines()
+        f.close()
+        index = 0
+        for i in self.G.nodes():
+            for j in self.G.nodes():
+                temp = dist_data[index].split("\n")
+                self.pairwiseDistance[i][j] = float(temp[0])
+                index += 1
+
+        # print("loaded distance")
+
 
     def distance(self,x,y):
+        if self.inputDistance != "":
+            return self.pairwiseDistance[int(x)][int(y)]
+
         if self.distanceFunction == "Jaccard":
             return self.Jaccard_distance(x,y)
         distance = 0
@@ -80,13 +100,15 @@ class K_center:
                 distances = [self.distance(t, self.centroids[centroid]) for centroid in self.centroids]
                 min_distances[index] = min(distances)
                 index +=1
-            # print("Min = ",min_distances)
             next_center = min_distances.index(max(min_distances))
             self.centroids[c] = nodes_list[next_center]
             temp_G.remove_node(nodes_list[next_center])
-            # print("size of the graph = ", len(temp_G.nodes()))
 
     def fit(self):
+        # print("distance in kc = ", self.inputDistance)
+        if self.inputDistance != "":
+            self.precompute_pairwiseDistances()
+
         self.find_centers()
         # Assign points to closest centers
         for features in self.nodes_list:
