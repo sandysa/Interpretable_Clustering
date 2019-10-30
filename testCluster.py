@@ -16,8 +16,8 @@ from SupportFunctions import *
 # domain  = {"crime","adult", "household","sanitation","accident","pokec","dblp"}
 # domains we use = {'accident','sanitation','crime','adult'}
 # Corresponding distances:{Jaccard,euclidean,euclidean,euclidean}
-domain = "accident"
-domain_distance = "Jaccard"
+domain = "crime"
+domain_distance = "euclidean"
 
 
 def test_Kcenter(G, k,domain):
@@ -66,10 +66,13 @@ def raw_Interpretability(G,k,domain):
 
 
 # IC algorithm 1
-def find_best_config(G,k,Features,feature_indices=[]):
+def find_best_config(G,k,Features,feature_indices=[],distance_file=""):
     V  = getV(Features,k)
     temp_objective = np.zeros((len(V),len(Features)))
+    kc_objective =  np.zeros((k,len(Features)))
+    # Run k-center for all values from 1-k
     for i in range(len(Features)):
+        print("precomputing kC values for feature", i)
         if domain == "accident":
             G_prime =  getAccidentSubGraph(G,Features,i)
         elif domain == "adult":
@@ -80,24 +83,41 @@ def find_best_config(G,k,Features,feature_indices=[]):
             ub = temp[1].strip()
             G_prime = getSubGraph_rangeValue(G,lb,ub,feature_indices[i])
         if G_prime.number_of_nodes() == 0:
-            temp_objective[:,i] = 100000
+            kc_objective[:,i] = 100000
             continue
+
+        for trial_k in range(1, k+1):
+            if G_prime.number_of_nodes() < trial_k:
+                    kc_objective[trial_k-1][i] = float('inf')
+                    continue
+            kc = K_center(G_prime, trial_k,domain_distance,distance_file)
+            kc.fit()
+            kc_objective[trial_k-1][i] = kc.ObjValue()
+            del kc
+            print(trial_k)
+
+    # for i in range(len(Features)):
+    #     if domain == "accident":
+    #         G_prime =  getAccidentSubGraph(G,Features,i)
+    #     elif domain == "adult":
+    #         G_prime  = getAdultSubGraph(G,Features,i)
+    #     else:
+    #         temp = Features[i].split("-")
+    #         lb = temp[0].strip()
+    #         ub = temp[1].strip()
+    #         G_prime = getSubGraph_rangeValue(G,lb,ub,feature_indices[i])
+    #     if G_prime.number_of_nodes() == 0:
+    #         temp_objective[:,i] = 100000
+    #         continue
         # Call K center for each config.
+        print("Evaluating V")
         for v_index in range(len(V)):
             v = V[v_index]
-            # if(v_index%100 == 0):
-            #     print(v)
-
-            # Num of nodes satisfying the feature < config of V.Skip.
-            if(G_prime.number_of_nodes() < int(v[i])):
-                temp_objective[:,i] = 100000
+            # Not enough points in dataset with this feature to form clusters.
+            if G_prime.number_of_nodes() < int(v[i]):
+                temp_objective[:,i] = float('inf')
                 continue
-
-            kc = K_center(G_prime, int(v[i]),domain_distance)
-            kc.fit()
-            temp_objective[v_index][i] = kc.ObjValue()
-            del kc
-            
+            temp_objective[v_index][i] = kc_objective[int(v[i]-1)][i]
 
     best_obj = 10000000
     best_config = []
@@ -181,7 +201,7 @@ def getAdultSubGraph(G,Features,i):
     return G_prime
 
 
-def test_accident_IC1(G,k):
+def test_accident_IC1(G,k,distance_file):
      Features =['Pedestrian hit','Vehicle collision','Death','Others'] #accident types
      feature_indices = [10,10,10,10]
      start_time = time.time()
@@ -225,7 +245,7 @@ def test_accident_IC1(G,k):
             frequent_pattern_mining(members,Features)
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
-def test_sanitation_IC1(G, k):
+def test_sanitation_IC1(G, k,distance_file):
     Features = ['0-25','25-50','50-75','75-100'] #pit latrines
     # correponding index of the features in the data.. pit latrine is 3 since string features are ignored.
     feature_indices = [4,4,4,4]
@@ -274,7 +294,7 @@ def test_sanitation_IC1(G, k):
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
 
-def test_crime_IC1(G,k):
+def test_crime_IC1(G,k,distance_file):
     Features = ['0-.25','.25-.50','.50-.75','.75-1.00']
     feature_indices = [16,16,16,16]
     start_time = time.time()
@@ -318,13 +338,14 @@ def test_crime_IC1(G,k):
             print("**********************")
             print("median_income:",Features)
             print("Median family income:",(median_income_count/total_nodes_incluster))
-            frequent_pattern_mining(members,Features)
+            # frequent_pattern_mining(members,Features)
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
-def test_adult_IC1(G,k):
+def test_adult_IC1(G,k,distance_file):
     Features = ['age <= 40 and pay <= 50K', 'age <= 40 and pay >50K','age >40 and pay <=50K', 'age >40 and pay >50K']
     start_time = time.time()
-    best_config, best_obj = find_best_config(G,k, Features)
+    feature_indices = [16,16,16,16] #placeholder.
+    best_config, best_obj = find_best_config(G,k, Features,feature_indices,distance_file)
     print("Final objective = %f"%best_obj)
     print("Best config:", best_config)
     print("*************************************")
@@ -365,16 +386,18 @@ def test_adult_IC1(G,k):
 
 
 
-def test_IKC1(G,k):
+def test_IKC1(G,k,distance_file):
     print("Interpretable Clustering Algorithm 1")
+    print("Input distance file = ", distance_file)
     if domain == "sanitation":
-        test_sanitation_IC1(G,k)
+        test_sanitation_IC1(G,k,distance_file)
     if domain == "crime":
-        test_crime_IC1(G,k)
+        test_crime_IC1(G,k,distance_file)
     if domain == "accident":
-        test_accident_IC1(G,k)
+        test_accident_IC1(G,k,distance_file)
     if domain == "adult":
-        test_adult_IC1(G,k)
+        print("dist file in ikc",distance_file)
+        test_adult_IC1(G,k,distance_file)
 
 
 
@@ -382,9 +405,10 @@ def test_IKC1(G,k):
 def main():
     Ld = LoadData(domain)
     G  = Ld.readFile()
-    k = 40
+    k = 50
+    distance_file = domain+"_distance.txt"
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance)
-    test_IKC1(G,k) #currently works for t <= k
+    test_IKC1(G,k,distance_file) #currently works for t <= k
     # test_Kcenter(G, k,domain)
     # raw_Interpretability(G,k,domain)
     del Ld
