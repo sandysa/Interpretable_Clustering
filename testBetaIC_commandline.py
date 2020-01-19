@@ -17,14 +17,14 @@ from betaStrong import *
 import sys
 
 domain_arr  = ['accident','sanitation','crime','adult']
-distance_arr=['jaccard','euclidean','euclidean','euclidean']
+distance_arr=["Jaccard",'euclidean','euclidean','euclidean']
 # domains we use = {'accident','sanitation','crime','adult'}
 # Corresponding distances:{Jaccard,euclidean,euclidean,euclidean}
-domain = "crime"
-domain_distance = "euclidean"
+domain = ""
+domain_distance = ""
 
-def test_Kcenter(G, k,domain):
-    print("calling K-center")
+def test_Kcenter(G, k,domain, domain_distance):
+    print("calling K-center"+domain_distance)
     kc = K_center(G, k,domain_distance)
     start = time.time()
     kc.fit()
@@ -54,7 +54,7 @@ def main():
     distance_file = domain+"_distance.txt"
     # distance_file = ""
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance, "beta=", beta)
-    aff_array = test_Kcenter(G,k,domain)
+    aff_array = test_Kcenter(G,k,domain,domain_distance)
     print("\n")
     print("#######################################################################\n")
     bs = betaStrong(domain,G, aff_array,k, beta, domain_distance,distance_file)
