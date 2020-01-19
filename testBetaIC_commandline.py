@@ -41,6 +41,7 @@ def test_Kcenter(G, k,domain, domain_distance):
 def main():
     if not len(sys.argv)==4:
         print ("python testBetaIC_commandline.py <k> <beta> <domain number> \n Domain num: \n 0 : accident, 1: sanitation, 2: crime, 3: adult")
+        return
     k = int(sys.argv[1])#50
     beta = float(sys.argv[2])
     domain_num=int(sys.argv[3])
