@@ -51,9 +51,10 @@ def main():
     print (domain+" "+ domain_distance)
     Ld = LoadData(domain)
     G  = Ld.readFile()
-    
-    distance_file = domain+"_distance.txt"
-    # distance_file = ""
+    distance_file = ""
+    if (os.path.isfile(domain+"_distance.txt")):
+        distance_file = domain+"_distance.txt"
+
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance, "beta=", beta)
     aff_array = test_Kcenter(G,k,domain,domain_distance)
     print("\n")

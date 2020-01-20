@@ -38,8 +38,8 @@ def test_Kcenter(G, k,domain):
 def main():
     Ld = LoadData(domain)
     G  = Ld.readFile()
-    k = 50
-    beta = 1.0
+    k = 5
+    beta = 0.8
     distance_file = domain+"_distance.txt"
     # distance_file = ""
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance, "beta=", beta)
