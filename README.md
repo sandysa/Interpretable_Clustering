@@ -1,6 +1,7 @@
 # Interpretable_Clustering
 Python codebase for "Balancing the Tradeoff Between Clustering Value and Interpretability", published at AIES 2020.
 Authors: Sandhya Saisubramanian*, Sainyam Galhotra*, and Shlomo Zilberstein
+
 Link to paper: https://arxiv.org/pdf/1912.07820.pdf
 
 Files:
@@ -18,7 +19,7 @@ SupportFunctions.py - Functions to calculate interpretability score, sub-graphs 
 
 Dependencies: pyfpgrowth package for pattern mining, networkx for graph storage, numpy.
 
-Code Execution:
+**Code Execution**:
 
 "Domain num - 0 : accident, 1: sanitation, 2: crime, 3: adult"
 
