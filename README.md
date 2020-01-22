@@ -4,7 +4,10 @@ Authors: Sandhya Saisubramanian*, Sainyam Galhotra*, and Shlomo Zilberstein
 
 Link to paper: https://arxiv.org/pdf/1912.07820.pdf
 
-Files:
+-----------------------------------------------------------------------------------------------------------
+
+File Description:
+
 Kcenter.py - Implements K-center algorithm 
 
 LoadData.py - Loads data files and returns a graph used for clustering
@@ -16,10 +19,12 @@ betaStrong.py - Implementation of Algorithm 4 in the paper
 SupportFunctions.py - Functions to calculate interpretability score, sub-graphs and nodes that satisfy a feature value.
 
 
+----------------------------------------------------------------------------------------------------------------
 
-Dependencies: pyfpgrowth package for pattern mining, networkx for graph storage, numpy.
 
 **Code Execution**:
+
+Dependencies: pyfpgrowth package for pattern mining, networkx for graph storage, numpy.
 
 "Domain num - 0 : accident, 1: sanitation, 2: crime, 3: adult"
 
