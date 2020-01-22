@@ -29,6 +29,9 @@ Dependencies: pyfpgrowth package for pattern mining, networkx for graph storage,
 To generate beta-interpretable clustering with varying beta (Algorithm 1):
 python testBetaIC.py [k] [beta] [domain number]
 
+To generate clusters with other approaches:
+python testCluster.py [k] [domain number] [approach]
+
 To generate strongly interpretable clusters with Algorithm 4:
 python testCluster.py [k] [domain number] 0
 
