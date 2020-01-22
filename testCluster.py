@@ -7,6 +7,7 @@ import numpy as np
 import networkx as nx
 import time
 import os
+import sys
 
 from Kcenter import *
 from LoadData import *
@@ -15,8 +16,10 @@ from SupportFunctions import *
 
 # domains we use = {'accident','sanitation','crime','adult'}
 # Corresponding distances:{Jaccard,euclidean,euclidean,euclidean}
-domain = "accident"
-domain_distance = "Jaccard"
+domain_arr=['accident','sanitation','crime','adult']
+distance_arr=["Jaccard",'euclidean','euclidean','euclidean']
+domain = ""
+domain_distance = ""
 
 
 def test_Kcenter(G, k,domain):
@@ -66,6 +69,7 @@ def raw_Interpretability(G,k,domain):
 
 # IC algorithm 1
 def find_best_config(G,k,Features,feature_indices=[],distance_file=""):
+    print("best config")
     V  = getV(Features,k)
     temp_objective = np.zeros((len(V),len(Features)))
     kc_objective =  np.zeros((k,len(Features)))
@@ -95,19 +99,6 @@ def find_best_config(G,k,Features,feature_indices=[],distance_file=""):
             del kc
             print(trial_k)
 
-    # for i in range(len(Features)):
-    #     if domain == "accident":
-    #         G_prime =  getAccidentSubGraph(G,Features,i)
-    #     elif domain == "adult":
-    #         G_prime  = getAdultSubGraph(G,Features,i)
-    #     else:
-    #         temp = Features[i].split("-")
-    #         lb = temp[0].strip()
-    #         ub = temp[1].strip()
-    #         G_prime = getSubGraph_rangeValue(G,lb,ub,feature_indices[i])
-    #     if G_prime.number_of_nodes() == 0:
-    #         temp_objective[:,i] = 100000
-    #         continue
         # Call K center for each config.
         print("Evaluating V")
         for v_index in range(len(V)):
@@ -245,6 +236,7 @@ def test_accident_IC1(G,k,distance_file):
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
 def test_sanitation_IC1(G, k,distance_file):
+    print("hello")
     Features = ['0-25','25-50','50-75','75-100'] #pit latrines
     # correponding index of the features in the data.. pit latrine is 3 since string features are ignored.
     feature_indices = [4,4,4,4]
@@ -385,7 +377,7 @@ def test_adult_IC1(G,k,distance_file):
 
 
 
-def test_IKC1(G,k,distance_file):
+def test_IKC1(G,k,domain,distance_file):
     print("Interpretable Clustering Algorithm 1")
     print("Input distance file = ", distance_file)
     if domain == "sanitation":
@@ -429,7 +421,7 @@ def find_interpretable_partition(G,k,Features,feature_indices=[],distance_file="
     print("total clusters = ", total_count)
     return final_obj
 
-def baseline_partition(G,k,distance_file):
+def baseline_partition(G,k,domain,distance_file):
     kc_obj = 0
     start_time = time.time()
     if domain == "accident":
@@ -450,18 +442,36 @@ def baseline_partition(G,k,distance_file):
 
 
 def main():
+    if not len(sys.argv)==4:
+        print ("Input format:")
+        print ("python testCluster.py <k> <domain number> <approach> \n Domain num: \n 0 : accident, 1: sanitation, 2: crime, 3: adult")
+        print("Approach: \n 0 : strong-interpretability (IKC), 1: k-center, 2: Partition, 3: KC_F")
+        return
+    
+    k = int(sys.argv[1])#50
+    domain_num=int(sys.argv[2])
+    approach =  int(sys.argv[3])
+
+    domain = domain_arr[domain_num]
+    domain_distance = distance_arr[domain_num]
+
     Ld = LoadData(domain)
     G  = Ld.readFile()
-    k = 10
+    
     distance_file = ""
     if (os.path.isfile(domain+"_distance.txt")):
         distance_file = domain+"_distance.txt"
 
     print("Dataset:",domain, "K = ",k, "Distance:", domain_distance)
-    # test_IKC1(G,k,distance_file) #currently works for t <= k
-    # test_Kcenter(G, k,domain)
-    # raw_Interpretability(G,k,domain)
-    baseline_partition(G,k,distance_file)
+    if(approach == 0):
+        test_IKC1(G,k,domain,distance_file) 
+    elif approach == 1:
+        test_Kcenter(G,k,domain)
+    elif approach == 2:
+        baseline_partition(G,k,domain,distance_file)
+    else:
+        raw_Interpretability(G,k,domain)
+
     del Ld
 
 
