@@ -21,6 +21,7 @@ Dependencies: pyfpgrowth package for pattern mining, networkx for graph storage,
 Code Execution:
 
 "Domain num - 0 : accident, 1: sanitation, 2: crime, 3: adult"
+
 "Approach - 0 : strong-interpretability (IKC), 1: k-center, 2: Partition, 3: KC_F"
 
 
