@@ -30,13 +30,13 @@ To generate beta-interpretable clustering with varying beta (Algorithm 1):
 python testBetaIC.py [k] [beta] [domain number]
 
 To generate strongly interpretable clusters with Algorithm 4:
-python testCluster.py <k> <domain number> 0
+python testCluster.py [k] [domain number] 0
 
 To generate clusters with k-center alone (baseline 1 in the paper):
-python testCluster.py <k> <domain number> 1
+python testCluster.py [k] [domain number] 1
 
 To generate clusters with paritions over FoI (baseline 2 in the paper, denoted as P_F):
-python testCluster.py <k> <domain number> 2
+python testCluster.py [k] [domain number] 2
 
 To generate clusters with k-center only using FoI (baseline 3 in the paper, denoted as KC_F):
-python testCluster.py <k> <domain number> 3
+python testCluster.py [k] [domain number] 3
