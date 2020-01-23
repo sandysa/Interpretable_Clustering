@@ -210,7 +210,8 @@ class betaStrong():
             min_dist = float('inf')
             best_fit = -1
             while best_fit == -1:
-                temp_aff_array = self.aff_array.copy()
+                # temp_aff_array = self.aff_array.copy()
+                temp_aff_array = self.aff_array[:]
                 for i in range(self.k):
                     if distances[i] < min_dist:
                         min_dist = distances[i]

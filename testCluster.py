@@ -68,7 +68,7 @@ def raw_Interpretability(G,k,domain):
 
 
 # IC algorithm 1
-def find_best_config(G,k,Features,feature_indices=[],distance_file=""):
+def find_best_config(G,k,domain,Features,feature_indices=[],distance_file=""):
     print("best config")
     V  = getV(Features,k)
     temp_objective = np.zeros((len(V),len(Features)))
@@ -97,9 +97,9 @@ def find_best_config(G,k,Features,feature_indices=[],distance_file=""):
             kc.fit()
             kc_objective[trial_k-1][i] = kc.ObjValue()
             del kc
-            print(trial_k)
+            # print(trial_k)
 
-        # Call K center for each config.
+        # Call K center for each config.loaddblpData
         print("Evaluating V")
         for v_index in range(len(V)):
             v = V[v_index]
@@ -191,11 +191,11 @@ def getAdultSubGraph(G,Features,i):
     return G_prime
 
 
-def test_accident_IC1(G,k,distance_file):
+def test_accident_IC1(G,k,domain,distance_file):
      Features =['Pedestrian hit','Vehicle collision','Death','Others'] #accident types
      feature_indices = [10,10,10,10]
      start_time = time.time()
-     best_config, best_obj = find_best_config(G,k,Features,feature_indices)
+     best_config, best_obj = find_best_config(G,k,domain,Features,feature_indices,distance_file)
      print("KC objective = %f"%best_obj)
      print("best config = ", best_config)
      print("*************************************")
@@ -203,7 +203,7 @@ def test_accident_IC1(G,k,distance_file):
      for i in range(len(Features)):
         attr = nx.get_node_attributes(G,'attributes')
         G_prime = getAccidentSubGraph(G,Features,i)
-        kc = K_center(G_prime, int(best_config[i]),domain_distance)
+        kc = K_center(G_prime, int(best_config[i]),domain_distance,distance_file)
         kc.fit()
         centroids = kc.getCentroids()
         attr = nx.get_node_attributes(G_prime,'attributes')
@@ -235,13 +235,13 @@ def test_accident_IC1(G,k,distance_file):
             frequent_pattern_mining(members,Features)
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
-def test_sanitation_IC1(G, k,distance_file):
+def test_sanitation_IC1(G, k,domain,distance_file):
     print("hello")
     Features = ['0-25','25-50','50-75','75-100'] #pit latrines
     # correponding index of the features in the data.. pit latrine is 3 since string features are ignored.
     feature_indices = [4,4,4,4]
     start_time = time.time()
-    best_config, best_obj = find_best_config(G,k,Features,feature_indices)
+    best_config, best_obj = find_best_config(G,k,domain,Features,feature_indices,distance_file)
     print("Final objective = %f"%best_obj)
     print("best config = ", best_config)
     print("*************************************")
@@ -251,7 +251,7 @@ def test_sanitation_IC1(G, k,distance_file):
         lb = temp[0].strip()
         ub = temp[1].strip()
         G_prime  = getSubGraph_rangeValue(G,lb,ub,feature_indices[i])
-        kc = K_center(G_prime, int(best_config[i]),domain_distance)
+        kc = K_center(G_prime, int(best_config[i]),domain_distance,distance_file)
         kc.fit()
         attr = nx.get_node_attributes(G_prime,'attributes')
         for cluster in range(best_config[i]):
@@ -285,11 +285,11 @@ def test_sanitation_IC1(G, k,distance_file):
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
 
-def test_crime_IC1(G,k,distance_file):
+def test_crime_IC1(G,k,domain,distance_file):
     Features = ['0-.25','.25-.50','.50-.75','.75-1.00']
     feature_indices = [16,16,16,16]
     start_time = time.time()
-    best_config, best_obj = find_best_config(G,k, Features,feature_indices)
+    best_config, best_obj = find_best_config(G,k, domain,Features,feature_indices,distance_file)
     print("Final objective = %f"%best_obj)
     print("Best config:", best_config)
     print("*************************************")
@@ -299,7 +299,7 @@ def test_crime_IC1(G,k,distance_file):
         lb = temp[0].strip()
         ub = temp[1].strip()
         G_prime  = getSubGraph_rangeValue(G,lb,ub,feature_indices[i])
-        kc = K_center(G_prime, int(best_config[i]),domain_distance)
+        kc = K_center(G_prime, int(best_config[i]),domain_distance,distance_file)
         kc.fit()
         attr = nx.get_node_attributes(G_prime,'attributes')
         for cluster in range(best_config[i]):
@@ -332,11 +332,11 @@ def test_crime_IC1(G,k,distance_file):
             # frequent_pattern_mining(members,Features)
         print("Total time taken for alg IC1 (s) = %f"%(time.time() - start_time))
 
-def test_adult_IC1(G,k,distance_file):
+def test_adult_IC1(G,k,domain,distance_file):
     Features = ['age <= 40 and pay <= 50K', 'age <= 40 and pay >50K','age >40 and pay <=50K', 'age >40 and pay >50K']
     start_time = time.time()
     feature_indices = [16,16,16,16] #placeholder.
-    best_config, best_obj = find_best_config(G,k, Features,feature_indices,distance_file)
+    best_config, best_obj = find_best_config(G,k, domain, Features,feature_indices,distance_file)
     print("Final objective = %f"%best_obj)
     print("Best config:", best_config)
     print("*************************************")
@@ -344,7 +344,7 @@ def test_adult_IC1(G,k,distance_file):
     for i in range(len(Features)):
         attr = nx.get_node_attributes(G,'attributes')
         G_prime = getAdultSubGraph(G,Features,i)
-        kc = K_center(G_prime, int(best_config[i]),domain_distance)
+        kc = K_center(G_prime, int(best_config[i]),domain_distance,distance_file)
         kc.fit()
         centroids = kc.getCentroids()
         attr = nx.get_node_attributes(G_prime,'attributes')
@@ -381,14 +381,14 @@ def test_IKC1(G,k,domain,distance_file):
     print("Interpretable Clustering Algorithm 1")
     print("Input distance file = ", distance_file)
     if domain == "sanitation":
-        test_sanitation_IC1(G,k,distance_file)
+        test_sanitation_IC1(G,k,domain,distance_file)
     if domain == "crime":
-        test_crime_IC1(G,k,distance_file)
+        test_crime_IC1(G,k,domain,distance_file)
     if domain == "accident":
-        test_accident_IC1(G,k,distance_file)
+        test_accident_IC1(G,k,domain,distance_file)
     if domain == "adult":
         print("dist file in ikc",distance_file)
-        test_adult_IC1(G,k,distance_file)
+        test_adult_IC1(G,k,domain,distance_file)
 
 # This baseline partitions the data into |F| clusters by optimizing for
 # interpretability (homogeneity) alone.
@@ -442,6 +442,10 @@ def baseline_partition(G,k,domain,distance_file):
 
 
 def main():
+    global domain
+    global distance_file
+    global domain_distance 
+    
     if not len(sys.argv)==4:
         print ("Input format:")
         print ("python testCluster.py <k> <domain number> <approach> \n Domain num: \n 0 : accident, 1: sanitation, 2: crime, 3: adult")
@@ -462,7 +466,7 @@ def main():
     if (os.path.isfile(domain+"_distance.txt")):
         distance_file = domain+"_distance.txt"
 
-    print("Dataset:",domain, "K = ",k, "Distance:", domain_distance)
+    print("Dataset:",domain, "K = ",k, "Distance:", domain_distance, "distance file = ", distance_file)
     if(approach == 0):
         test_IKC1(G,k,domain,distance_file) 
     elif approach == 1:

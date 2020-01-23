@@ -35,6 +35,10 @@ def test_Kcenter(G, k,domain, domain_distance):
 
 
 def main():
+    global domain
+    global domain_distance
+    global distance_file
+    
     if not len(sys.argv)==4:
         print ("python testBetaIC.py <k> <beta> <domain number> \n Domain num: \n 0 : accident, 1: sanitation, 2: crime, 3: adult")
         return
