@@ -113,7 +113,10 @@ class betaStrong():
                 c2_findex = l
 
         c1_c2_union = self.union(node_set[c1_findex],node_set[c2_findex])
+
         R = list(set(nodeList).difference(set(c1_c2_union)))
+        R.sort()
+
         limit1 = int(round((l0 * len(R))/(l0+l1)))
         limit2 = int(round((l1 * len(R))/(l0+l1)))
         r1,r2 = self.indexed_partition(R,limit1, limit2)
@@ -122,7 +125,10 @@ class betaStrong():
         return c1, c2
 
     def union(self, a, b):
-        return list(set(a) | set(b))
+        # return list(set(a) | set(b))
+        lst= list(set(a) | set(b))
+        lst.sort()
+        return lst
 
     def kcenterValue(self):
         centroid = np.zeros((self.k))
@@ -177,9 +183,12 @@ class betaStrong():
                 best_centroid = m
         centroid[target_cluster] = best_centroid
         discard_pile = list(set(nodeList).difference(set(majorityNodes)))
+        discard_pile.sort()
+
         print("discard pile size=", len(discard_pile))
         if(discard_count > len(discard_pile)):
-            print("Error in discard pile calculation")
+            print("Discard count is > discard pile size")
+            sys.exit()
 
         # Find distance of all discard nodes wrt. new centroid.
         distances = [self.pairwiseDistance[m][best_centroid]  for m in discard_pile]
@@ -219,7 +228,13 @@ class betaStrong():
                 temp_aff_array[m] = best_fit
                 orig_score = interpretabilityScore_cluster(self.G,self.domain, self.aff_array,self.k)
                 new_score = interpretabilityScore_cluster(self.G,self.domain, temp_aff_array,self.k)
-                if orig_score[best_fit] > self.beta  and new_score[best_fit] < self.beta:
+                            
+                if orig_score[best_fit] >= self.beta  and new_score[best_fit] >= orig_score[best_fit]:
+                    self.aff_array[m] = best_fit
+                    moved += 1
+                    # print("Nodes Moved so far:",moved)
+                # if orig_score[best_fit] >= self.beta  and new_score[best_fit] < self.beta:
+                else:
                     distances[best_fit] = float('inf')
                     best_fit = -1
                     min_dist = float('inf')
@@ -227,10 +242,8 @@ class betaStrong():
                     if min(distances) == float('inf'):
                         print("No C' prime cluster found - exiting")
                         sys.exit()
-                else:
-                    self.aff_array[m] = best_fit
-                    moved += 1
-                    # print("Nodes Moved so far:",moved)
+
+
 
 
     def beta_IC(self):
@@ -239,9 +252,11 @@ class betaStrong():
         iscore = interpretabilityScore(self.G,self.domain, self.aff_array,self.k)
         print("Current interpretability score = ",iscore )
         iter_index = 0
-        while( iscore < self.beta):
+        while( iscore < self.beta ):
             iter_index += 1
             print("Iteration:",iter_index)
+            if iter_index > 50:
+            	break
             target_cluster = self.identifyMinScoreCluster()
             majority_feature_index = self.get_majority_feature_index(target_cluster)
             minority_nodes = member_nodes(target_cluster, majority_feature_index,self.domain,self.G,self.aff_array)
@@ -250,7 +265,6 @@ class betaStrong():
             for c_prime in range(self.k):
                 if c_prime == target_cluster:
                     continue
-
                 member_nodes_prime = member_nodes(c_prime, majority_feature_index,self.domain,self.G,self.aff_array)
                 if len(member_nodes_prime) == 0:
                     continue
@@ -258,6 +272,7 @@ class betaStrong():
                 for s in minority_nodes:
                     for s_prime in member_nodes_prime:
                         distances_intercluster.append(self.getdistance(int(s),int(s_prime)))
+                # print ("e",distances_intercluster)
                 if min(distances_intercluster) < min_distance:
                     min_distance = min(distances_intercluster)
                     min_distance_cluster = c_prime
@@ -271,7 +286,6 @@ class betaStrong():
                 a = self.ClusterNodes(target_cluster,self.aff_array)
                 b = self.ClusterNodes(min_distance_cluster,self.aff_array)
                 union_cluster = self.union(a,b)
-
                 nodes_c, nodes_cPrime = self.greedy_partition(union_cluster)
                 for node in nodes_c:
                     self.aff_array[node] = target_cluster
