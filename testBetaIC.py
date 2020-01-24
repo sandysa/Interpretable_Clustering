@@ -24,7 +24,7 @@ domain = ""
 domain_distance = ""
 
 def test_Kcenter(G, k,domain, domain_distance):
-    print("calling K-center"+domain_distance)
+    print("calling K-center "+domain_distance)
     kc = K_center(G, k,domain_distance)
     start = time.time()
     kc.fit()
@@ -38,7 +38,7 @@ def main():
     global domain
     global domain_distance
     global distance_file
-    
+
     if not len(sys.argv)==4:
         print ("python testBetaIC.py <k> <beta> <domain number> \n Domain num: \n 0 : accident, 1: sanitation, 2: crime, 3: adult")
         return
@@ -48,7 +48,6 @@ def main():
 
     domain=domain_arr[domain_num]
     domain_distance=distance_arr[domain_num]
-    print (domain+" "+ domain_distance)
     Ld = LoadData(domain)
     G  = Ld.readFile()
     distance_file = ""
