@@ -24,13 +24,17 @@ domain = ""
 domain_distance = ""
 
 def test_Kcenter(G, k,domain, domain_distance):
-    print("calling K-center "+domain_distance)
+    print("calling K-center"+domain_distance)
     kc = K_center(G, k,domain_distance)
     start = time.time()
     kc.fit()
     print("time taken in seconds (KC)=", time.time() - start)
+    print("Obj = ",kc.ObjValue())
+    calculate_composition(G,k,kc.getAffiliationArray(),domain) #In pattern mining.py
     aff_array = kc.getAffiliationArray()
     del kc
+    iscore = interpretabilityScore(G,domain, aff_array,k)
+    print("Interpretability score = ",iscore )
     return aff_array
 
 
@@ -38,7 +42,7 @@ def main():
     global domain
     global domain_distance
     global distance_file
-
+    
     if not len(sys.argv)==4:
         print ("python testBetaIC.py <k> <beta> <domain number> \n Domain num: \n 0 : accident, 1: sanitation, 2: crime, 3: adult")
         return
@@ -48,6 +52,7 @@ def main():
 
     domain=domain_arr[domain_num]
     domain_distance=distance_arr[domain_num]
+    print (domain+" "+ domain_distance)
     Ld = LoadData(domain)
     G  = Ld.readFile()
     distance_file = ""
@@ -60,6 +65,7 @@ def main():
     print("#######################################################################\n")
     bs = betaStrong(domain,G, aff_array,k, beta, domain_distance,distance_file)
     aff_array = bs.beta_IC()
+    calculate_composition(G,k,aff_array,domain)
     del Ld
 
 
