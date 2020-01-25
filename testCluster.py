@@ -287,7 +287,9 @@ def test_sanitation_IC1(G, k,domain,distance_file):
 
 def test_crime_IC1(G,k,domain,distance_file):
     Features = ['0-.25','.25-.50','.50-.75','.75-1.00']
-    feature_indices = [16,16,16,16]
+    attr = nx.get_node_attributes(G,'attributes')
+    # feature_indices = [16,16,16,16]
+    feature_indices = [len(attr[0])-1,len(attr[0])-1,len(attr[0])-1,len(attr[0])-1]
     start_time = time.time()
     best_config, best_obj = find_best_config(G,k, domain,Features,feature_indices,distance_file)
     print("Final objective = %f"%best_obj)
@@ -432,7 +434,10 @@ def baseline_partition(G,k,domain,distance_file):
         feature_indices = [16,16,16,16] #placeholder.
     elif domain == "crime":
         Features = ['0-.25','.25-.50','.50-.75','.75-1.00']
-        feature_indices = [16,16,16,16]
+        # feature_indices = [16,16,16,16]
+        attr = nx.get_node_attributes(G,'attributes')
+        feature_indices = [len(attr[0])-1,len(attr[0])-1,len(attr[0])-1,len(attr[0])-1]
+
     elif domain == "sanitation":
         Features = ['0-25','25-50','50-75','75-100'] #pit latrines
         feature_indices = [4,4,4,4]

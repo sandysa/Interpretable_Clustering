@@ -79,68 +79,96 @@ def calculate_composition(G,k,aff_array,domain):
             print("*********************************************")
             print("age pay distribution in cluster = ", (age_pay_count/total_nodes_incluster))
             frequent_pattern_mining(members,age_pay)
-
     elif domain == "crime":
-        # percent_under_poverty = ['<25','25-50','50-75','>75']
-        # ViolentCrimesPerPop = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
-        # PercentPersonDenseHousing = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
-        MedianIncome = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
+        ViolentCrimesPerPop = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
         for cluster in range(k):
             total_nodes_incluster = 0
             members = []
-            income_count  = np.zeros((len(MedianIncome)))
-        #     community_crime = np.zeros((len(ViolentCrimesPerPop)))
-        #     dense_housing = np.zeros((len(PercentPersonDenseHousing)))
+            community_crime = np.zeros((len(ViolentCrimesPerPop)))
             for node in G.nodes():
                 aff = aff_array[node]
                 if aff == cluster:
                     attributes = attr[node]
+                    attribute_id = len(attributes)-1
                     total_nodes_incluster += 1
-                    if(float(attributes[16]) <= .25):
-                        income_count[0] += 1
+                    if(float(attributes[len(attributes)-1]) <= 0.25):
+                        community_crime[0] += 1
                         members.append('1')
-                    elif (float(attributes[16]) > .25 and float(attributes[16]) <= .50):
-                        income_count[1] += 1
+                    elif(float(attributes[len(attributes)-1]) > 0.25 and float(attributes[len(attributes)-1]) <= 0.5):
+                        community_crime[1] += 1
                         members.append('2')
-                    elif (float(attributes[16]) > .50 and float(attributes[16]) <=.75):
-                        income_count[2] += 1
+                    elif(float(attributes[len(attributes)-1]) > 0.5 and float(attributes[len(attributes)-1]) <= 0.75):
+                        community_crime[2] += 1
                         members.append('3')
                     else:
-                        income_count[3] += 1
+                        community_crime[3] += 1
                         members.append('4')
-        #                 community_crime[0] += 1
-        #             if(float(attributes[len(attributes)-1]) >= 0.25 and float(attributes[len(attributes)-1]) < 0.5):
-        #                 community_crime[1] += 1
-        #             if(float(attributes[len(attributes)-1]) >= 0.5 and float(attributes[len(attributes)-1]) <= 0.75):
-        #                 community_crime[2] += 1
-        #             if(float(attributes[len(attributes)-1]) > 0.75):
-        #                 community_crime[3] += 1
-
-        #             if(float(attributes[len(attributes)-1]) <0.25):
-        #                 community_crime[0] += 1
-        #             if(float(attributes[len(attributes)-1]) >= 0.25 and float(attributes[len(attributes)-1]) < 0.5):
-        #                 community_crime[1] += 1
-        #             if(float(attributes[len(attributes)-1]) >= 0.5 and float(attributes[len(attributes)-1]) <= 0.75):
-        #                 community_crime[2] += 1
-        #             if(float(attributes[len(attributes)-1]) > 0.75):
-        #                 community_crime[3] += 1
-        #             #   Percent population in dense housing. (many ppl in small house)
-        #
-        #             if(float(attributes[74]) <0.25):
-        #                 dense_housing[0] += 1
-        #             if(float(attributes[74]) >= 0.25 and float(attributes[74]) < 0.5):
-        #                 dense_housing[1] += 1
-        #             if(float(attributes[74]) >= 0.5 and float(attributes[74]) <= 0.75):
-        #                 dense_housing[2] += 1
-        #             if(float(attributes[74]) > 0.75):
-        #                 dense_housing[3] += 1
             print("**********************")
-        #     print("ViolentCrimesPerPopulation:",ViolentCrimesPerPop)
-        #     print("Number of nodes (districts) with avg crime rate:",(community_crime/total_nodes_incluster))
-        #     print("dense_housing percentage:",(dense_housing/total_nodes_incluster))
-            print("MedianIncome", MedianIncome)
-            print("Median family income distribution cluster = ", (income_count/total_nodes_incluster))
-            frequent_pattern_mining(members,MedianIncome)
+            print("ViolentCrimesPerPopulation:",ViolentCrimesPerPop)
+            print("Number of nodes (districts) with avg crime rate:",(community_crime/total_nodes_incluster))
+            frequent_pattern_mining(members,ViolentCrimesPerPop)
+
+    # elif domain == "crime":
+    #     # percent_under_poverty = ['<25','25-50','50-75','>75']
+    #     # ViolentCrimesPerPop = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
+    #     # PercentPersonDenseHousing = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
+    #     MedianIncome = ['<0.25','0.25-0.5','0.5-0.75','0.75-1']
+    #     for cluster in range(k):
+    #         total_nodes_incluster = 0
+    #         members = []
+    #         income_count  = np.zeros((len(MedianIncome)))
+    #     #     community_crime = np.zeros((len(ViolentCrimesPerPop)))
+    #     #     dense_housing = np.zeros((len(PercentPersonDenseHousing)))
+    #         for node in G.nodes():
+    #             aff = aff_array[node]
+    #             if aff == cluster:
+    #                 attributes = attr[node]
+    #                 total_nodes_incluster += 1
+    #                 if(float(attributes[16]) <= .25):
+    #                     income_count[0] += 1
+    #                     members.append('1')
+    #                 elif (float(attributes[16]) > .25 and float(attributes[16]) <= .50):
+    #                     income_count[1] += 1
+    #                     members.append('2')
+    #                 elif (float(attributes[16]) > .50 and float(attributes[16]) <=.75):
+    #                     income_count[2] += 1
+    #                     members.append('3')
+    #                 else:
+    #                     income_count[3] += 1
+    #                     members.append('4')
+    #     #                 community_crime[0] += 1
+    #     #             if(float(attributes[len(attributes)-1]) >= 0.25 and float(attributes[len(attributes)-1]) < 0.5):
+    #     #                 community_crime[1] += 1
+    #     #             if(float(attributes[len(attributes)-1]) >= 0.5 and float(attributes[len(attributes)-1]) <= 0.75):
+    #     #                 community_crime[2] += 1
+    #     #             if(float(attributes[len(attributes)-1]) > 0.75):
+    #     #                 community_crime[3] += 1
+
+    #     #             if(float(attributes[len(attributes)-1]) <0.25):
+    #     #                 community_crime[0] += 1
+    #     #             if(float(attributes[len(attributes)-1]) >= 0.25 and float(attributes[len(attributes)-1]) < 0.5):
+    #     #                 community_crime[1] += 1
+    #     #             if(float(attributes[len(attributes)-1]) >= 0.5 and float(attributes[len(attributes)-1]) <= 0.75):
+    #     #                 community_crime[2] += 1
+    #     #             if(float(attributes[len(attributes)-1]) > 0.75):
+    #     #                 community_crime[3] += 1
+    #     #             #   Percent population in dense housing. (many ppl in small house)
+    #     #
+    #     #             if(float(attributes[74]) <0.25):
+    #     #                 dense_housing[0] += 1
+    #     #             if(float(attributes[74]) >= 0.25 and float(attributes[74]) < 0.5):
+    #     #                 dense_housing[1] += 1
+    #     #             if(float(attributes[74]) >= 0.5 and float(attributes[74]) <= 0.75):
+    #     #                 dense_housing[2] += 1
+    #     #             if(float(attributes[74]) > 0.75):
+    #     #                 dense_housing[3] += 1
+    #         print("**********************")
+    #     #     print("ViolentCrimesPerPopulation:",ViolentCrimesPerPop)
+    #     #     print("Number of nodes (districts) with avg crime rate:",(community_crime/total_nodes_incluster))
+    #     #     print("dense_housing percentage:",(dense_housing/total_nodes_incluster))
+    #         print("MedianIncome", MedianIncome)
+    #         print("Median family income distribution cluster = ", (income_count/total_nodes_incluster))
+    #         frequent_pattern_mining(members,MedianIncome)
 
     elif domain == "accident":
         Accident_type = ['Pedestrian hit','Vehicle collision','Death','Others']

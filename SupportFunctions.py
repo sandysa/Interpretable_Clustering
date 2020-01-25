@@ -71,11 +71,13 @@ def interpretabilityScore_crime(G,aff_array,k):
         if aff_array[node] == k:
             nodes_in_cluster += 1
             attributes = attr[node]
-            if(float(attributes[16]) <= .25):
+            # attribute_id = 16 # for median income. 
+            attribute_id = len(attributes)-1
+            if(float(attributes[attribute_id]) <= .25):
                 crime[0] += 1
-            elif(float(attributes[16]) > .25 and float(attributes[16]) <= .50):
+            elif(float(attributes[attribute_id]) > .25 and float(attributes[attribute_id]) <= .50):
                 crime[1] += 1
-            elif(float(attributes[16]) > .50 and float(attributes[16]) <= .75):
+            elif(float(attributes[attribute_id]) > .50 and float(attributes[attribute_id]) <= .75):
                 crime[2] += 1
             else:
                 crime[3] += 1
@@ -159,7 +161,9 @@ def interpretable_baseline_graph(G,domain):
             u_f = []
             G_temp.add_node(node)
             attribute = attr[node]
-            u_f.append(float(attribute[16]))
+            # attribute_id = 16 # for median income
+            attribute_id = len(attribute)-1
+            u_f.append(float(attribute[attribute_id]))
             temp_attr[node] = u_f
         nx.set_node_attributes(G_temp, temp_attr, 'attributes')
     elif domain == "accident":
@@ -323,17 +327,19 @@ def member_nodes_crime(cluster_id,aff_array,feature_index,G):
     for node in G.nodes():
         if aff_array[node] == cluster_id:
             attributes = attr[node]
+            # attribute_id = 16 # for median income
+            attribute_id = len(attributes)-1
             if feature_index == 1:
-                if(float(attributes[16]) <= .25):
+                if(float(attributes[attribute_id]) <= .25):
                     members.append(node)
             elif feature_index == 2:
-                if(float(attributes[16]) > .25 and float(attributes[16]) <= .50):
+                if(float(attributes[attribute_id]) > .25 and float(attributes[attribute_id]) <= .50):
                     members.append(node)
             elif feature_index == 3:
-                if(float(attributes[16]) > .50 and float(attributes[16]) <= .75):
+                if(float(attributes[attribute_id]) > .50 and float(attributes[attribute_id]) <= .75):
                     members.append(node)
             elif feature_index == 4:
-                if(float(attributes[16]) > .75):
+                if(float(attributes[attribute_id]) > .75):
                     members.append(node)
     return members
 
@@ -427,16 +433,18 @@ def features_nodes_crime(NodeList,feature_index,G):
     attr = nx.get_node_attributes(G,'attributes')
     for node in NodeList:
         attributes = attr[node]
+        # attribute_id = 16 # for median income
+        attribute_id = len(attributes)-1
         if feature_index == 1:
-            if(float(attributes[16]) <= .25):
+            if(float(attributes[attribute_id]) <= .25):
                 members.append(node)
         elif feature_index == 2:
-            if(float(attributes[16]) > .25 and float(attributes[16]) <= .50):
+            if(float(attributes[attribute_id]) > .25 and float(attributes[attribute_id]) <= .50):
                 members.append(node)
         elif feature_index == 3:
-            if(float(attributes[16]) > .50 and float(attributes[16]) <= .75):
+            if(float(attributes[attribute_id]) > .50 and float(attributes[attribute_id]) <= .75):
                 members.append(node)
         elif feature_index == 4:
-            if(float(attributes[16]) > .75):
+            if(float(attributes[attribute_id]) > .75):
                 members.append(node)
     return members
