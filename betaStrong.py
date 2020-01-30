@@ -229,7 +229,8 @@ class betaStrong():
                 orig_score = interpretabilityScore_cluster(self.G,self.domain, self.aff_array,self.k)
                 new_score = interpretabilityScore_cluster(self.G,self.domain, temp_aff_array,self.k)
                             
-                if orig_score[best_fit] >= self.beta  and new_score[best_fit] >= orig_score[best_fit]:
+                # if orig_score[best_fit] >= self.beta  and new_score[best_fit] >= orig_score[best_fit]:
+                if new_score[best_fit] >= orig_score[best_fit]:
                     self.aff_array[m] = best_fit
                     moved += 1
                     # print("Nodes Moved so far:",moved)
